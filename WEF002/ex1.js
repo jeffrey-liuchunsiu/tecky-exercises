@@ -78,8 +78,10 @@ for (item in dataObject) {
         let keyName = item.charAt(0).toUpperCase() + item.substring(1).replace(/[A-Z]/g, ' $&').trim()
         if (Array.isArray(dataObject[item])) {
             if (dataObject[item][0] instanceof Object) {
-                for (itemName in dataObject[item][0]) {
-                    console.log(`${keyName + "_" + itemName}: ${dataObject[item][0][itemName]}`)
+                for (item of dataObject[item]) {
+                    for (subName in item) {
+                        console.log(`${keyName + "_" + subName}: ${item[subName]}`)
+                    }
                 }
             } else {
                 console.log(`${keyName}: ${dataObject[item].join(", ")}`)
