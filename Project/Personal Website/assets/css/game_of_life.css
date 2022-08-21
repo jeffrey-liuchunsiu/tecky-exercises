@@ -1,0 +1,141 @@
+@import url('https://fonts.googleapis.com/css2?family=Aboreto&display=swap');
+
+* {
+    font-family: 'Aboreto', cursive;
+    font-weight: bold;
+}
+
+/* .all-container {
+    background-color: #cfcf;
+} */
+
+.title {
+    /* display: flex;
+    justify-content: center;
+    align-items: center; */
+    text-align: center;
+    font-weight: bolder;
+    font-size: 22px;
+    margin: 0.4rem;
+}
+
+#canvas {
+    margin: 0 1rem 0 1rem;
+}
+
+.marksContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    /* padding: 0 0 0.5rem 0; */
+}
+
+.marks {
+    margin: 0.2rem 0.5rem;
+}
+
+.reset {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 0.5rem;
+}
+
+#start-stop,
+#reset-game,
+#generate-pattern {
+    margin: 0 1rem;
+}
+
+.reminder {
+    margin: 0 1.5rem;
+}
+
+.slideContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* margin: 0.5rem; */
+}
+
+.speedText {
+    padding: 0 1rem;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+}
+
+.speedValue {
+    padding: 0 .5rem;
+}
+
+.input-loneliness,
+.input-overpopulation,
+.input-noChange,
+.input-reproduction {
+    margin: 2rem 10rem;
+}
+
+.keys-first-row,
+.keys-second-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* margin: 0.5rem; */
+}
+
+.keys-second-row kbd {
+    margin: 0.5rem;
+}
+
+
+/* The Modal (background) */
+.modal {
+    display: none;
+    /* Hidden by default */
+    position: fixed;
+    /* Stay in place */
+    z-index: 1;
+    /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%;
+    /* Full width */
+    height: 100%;
+    /* Full height */
+    overflow: auto;
+    /* Enable scroll if needed */
+    background-color: rgb(0, 0, 0);
+    /* Fallback color */
+    background-color: rgba(0, 0, 0, 0.4);
+    /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    /* Could be more or less, depending on screen size */
+    text-align: center;
+}
+
+/* The Close Button */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    text-align: right;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}

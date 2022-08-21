@@ -1,0 +1,21 @@
+.nineBoxes {
+    display: flex;
+    flex-wrap: wrap;
+    width: 240px;
+}
+
+.nineBoxes div {
+    background-color: #DAE8FC;
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+    margin: 3px;
+    padding: 22px;
+    /* flex: 0 0 30%; */
+    border: solid 1.5px #7394C3;
+
+    box-sizing: border-box;
+    width: 70px;
+    height: 70px;
+}
