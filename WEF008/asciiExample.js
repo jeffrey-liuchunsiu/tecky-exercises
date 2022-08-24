@@ -64,6 +64,7 @@
 let myAsciiArt;
 // let testVariable;
 // export { myAsciiArt };
+
 /*
   The size of generated ASCII graphics expressed in characters and lines.
 */
@@ -86,6 +87,7 @@ let gfx;
   ASCII codes.
 */
 let ascii_arr;
+// module.exports = { ascii_arr };
 
 /*
   A helper variable to store current "circular" time, useful in controlling of
@@ -222,7 +224,7 @@ function draw() {
   // noTint();
 }
 
-// module.exports = { ascii_arr };
+
 
 function mouseReleased() {
   /*

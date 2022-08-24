@@ -52,20 +52,6 @@ _0_
 _0_
 `
 
-function generatePattern(pattern) {
-    let resultArray = []
-    let indices = []
-    for (var i = 0; i < pattern.length; i++) {
-        if (pattern[i] === "\n") {
-            indices.push(i);
-        } else {
-            resultArray.push(pattern[i])
-        }
-    }
-    let patternWidth = indices[1] - indices[0] - 1;
-    let patternColumn = indices.length - 1;
-}
-
 function setup() {
     /* Set the canvas to be under the element #canvas*/
     const canvas = createCanvas(windowWidth - 20, windowHeight - 110);
