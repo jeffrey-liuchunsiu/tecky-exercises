@@ -1,0 +1,23 @@
+[
+    {
+        "startDate": "2022-08-29T10:52:58.541Z",
+        "endDate": "2022-08-29T10:52:58.542Z",
+        "timeNeeded": 1,
+        "extraMemUsed": 8192,
+        "name": "1 times "
+    },
+    {
+        "startDate": "2022-08-29T10:52:58.542Z",
+        "endDate": "2022-08-29T10:52:58.544Z",
+        "timeNeeded": 2,
+        "extraMemUsed": 0,
+        "name": "100 times "
+    },
+    {
+        "startDate": "2022-08-29T10:52:58.544Z",
+        "endDate": "2022-08-29T10:52:58.565Z",
+        "timeNeeded": 21,
+        "extraMemUsed": 0,
+        "name": "1000 times "
+    }
+]
