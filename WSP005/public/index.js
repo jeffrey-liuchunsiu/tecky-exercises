@@ -3,7 +3,12 @@ window.onload = () => {
 	// test()
 }
 
-// function test() {
+const socket = io.connect();
+socket.on('new-memo', (data) => {
+	// data has the content {msg:"Hello Client"}
+	// console.log(data)
+	loadMemos()
+})
 
 document
 	.querySelector('#memo-form')
@@ -119,7 +124,7 @@ export async function loadMemos(data) {
 	memosContainer.innerHTML = ''
 
 	// console.log(memosContainer.innerHTML);
-	let index = 0
+	// let index = 0
 	for (let memo of memos) {
 		let imageHTML
 		if (memo.image) {
@@ -131,19 +136,20 @@ export async function loadMemos(data) {
 			imageHTML = ''
 		}
 
+		// ${memo.image? '<>':'<div></div>'}
 		memosContainer.innerHTML += `<div class="col-lg-3 memo-without-login">
             <div class="memo-input-item">
-              <div class="count-container count-${index}">${memo.count}</div>
+              <div class="count-container count-${memo.id}">${memo.count}</div>
                 <button class="delete"><i class="bi bi-trash-fill"></i></button>
                 <form action="/">
-                    <textarea class="memo-input memo-input-${index}" name="memo-text">${memo.content}</textarea>
+                    <textarea class="memo-input memo-input-${memo.id}" name="memo-text">${memo.content}</textarea>
                 </form>
                 <button class="like"><i class="bi bi-hand-thumbs-up"></i></button>
                 <button class="edit"><i class="bi bi-pencil-square"></i></button>
             </div>
             ${imageHTML}
         </div>`
-		index++
+		// index++
 	}
 
 	const memoDivs = [...document.querySelectorAll('.memo-without-login')]
@@ -159,15 +165,16 @@ export async function loadMemos(data) {
 	for (let index in memoDivs) {
 		const memoDiv = memoDivs[index]
 		// console.log(memoDiv);
+		let memoId = memoDiv.getElementsByTagName('textarea')[0].className.split('-')[3]
 		memoDiv
 			.querySelector('.edit')
 			.addEventListener('click', async (event) => {
 				// Do your fetch  logic here
 				// console.log(event.currentTarget);
-				let textarea = document.querySelector(`.memo-input-${index}`)
+				let textarea = document.querySelector(`.memo-input-${memoId}`)
 				// console.log(textarea.value);
 				let formObject = {
-					index: index,
+					memoId: memoId,
 					content: textarea.value
 				}
 				const res = await fetch('/memos', {
@@ -192,7 +199,7 @@ export async function loadMemos(data) {
 				// let textarea = document.querySelector(`#memo-input-${index}`)
 				// console.log(textarea.value);
 				let formObject = {
-					index: index
+					memoId: memoId
 					// content: textarea.value
 				}
 				const res = await fetch('/memos', {
@@ -216,7 +223,7 @@ export async function loadMemos(data) {
 				// console.log(event.currentTarget);
 				// let count = document.querySelector(`.count-${index}`).innerHTML;
 				let countObject = {
-					index: index
+					memoId: memoId
 					// count: count,
 				}
 				// console.log(countObject);

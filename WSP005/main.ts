@@ -9,9 +9,23 @@ import { memoRoutes } from './routes/memoRoutes'
 import { loginRoutes } from './routes/userRoutes'
 import { isLoggedIn } from './guard'
 import { logger } from './logger'
+import { Client } from 'pg';
+import dotenv from 'dotenv';
+import http from 'http';
+import { Server as SocketIO } from 'socket.io';
 
-// let counter = 0;
+dotenv.config();
+
+export const client = new Client({
+	database: process.env.DB_NAME,
+	user: process.env.DB_USERNAME,
+	password: process.env.DB_PASSWORD
+});
+
+client.connect()
 const app = express()
+const server = new http.Server(app);
+export const io = new SocketIO(server);
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 
@@ -30,6 +44,7 @@ declare module 'express-session' {
 		counter?: number
 		user?: boolean
 		liked_usernames?: Array<string>
+		userId?: number
 	}
 }
 
@@ -228,7 +243,7 @@ app.get('/likedmemo', isLoggedIn, async (req: Request, res: Response, next) => {
 
 	try {
 		let data = await jsonfile.readFile(path.join('public', 'memos.json'))
-
+		// let data: any = await client.query(/*sql*/`SELECT * from memos`)
 		// type Memo = {
 		//     content?: string,
 		//     image?: string,
@@ -315,7 +330,7 @@ app.use((req, res) => {
 })
 const PORT = 8080
 
-app.listen(PORT, () => {
-    logger.info(`Listening at http://localhost:${PORT}/`)
+server.listen(PORT, () => {
+	logger.info(`Listening at http://localhost:${PORT}/`)
 	// console.log(`Listening at http://localhost:${PORT}/`)
 })

@@ -6,6 +6,7 @@ import { form } from '../main'
 export const memoRoutes = express.Router()
 import { isLoggedIn } from '../guard'
 import { logger } from '../logger'
+import { client, io } from '../main'
 
 memoRoutes.get('/', async (req: express.Request, res: express.Response) => {
 	// console.log(__dirname)
@@ -16,14 +17,16 @@ memoRoutes.get('/', async (req: express.Request, res: express.Response) => {
 	// console.log(path.resolve(path.resolve('../public/404.html')))
 	// console.log(path.resolve(__dirname,'route.ts'))
 	// console.log(path.join(__dirname,'route.ts'))
-
 	try {
-		const data = await jsonfile.readFile(path.join('public', 'memos.json'))
-		res.status(200).json(data)
-	} catch (err : any){
+		// await client.connect()
+		// const data = await jsonfile.readFile(path.join('public', 'memos.json'))
+		let data = await client.query(/*sql*/`SELECT * from memos`)
+		res.status(200).json(data.rows)
+
+	} catch (err: any) {
 		// res.status(400).sendFile(path.resolve('../public/404.html'))
 		res.status(400).send("Get Memo Error: " + err.message)
-        logger.error(err.message)
+		logger.error(err.message)
 	}
 })
 
@@ -32,7 +35,7 @@ memoRoutes.post('/', async (req: express.Request, res: express.Response) => {
 	// console.log(content);
 	let content: any
 
-	let data = await jsonfile.readFile(path.join('public', 'memos.json'))
+	// let data = await jsonfile.readFile(path.join('public', 'memos.json'))
 	// let filepath
 	form.parse(req, async (err, fields, files) => {
 		// if(files.length >0)
@@ -50,22 +53,29 @@ memoRoutes.post('/', async (req: express.Request, res: express.Response) => {
 			memoItem.image = fileName
 			memoItem.count = 0
 			memoItem.liked_usernames = []
+			await client.query(`INSERT INTO memos (content,image,count,created_at,updated_at) VALUES ($1,$2,$3,NOW(),NOW())`, [memoItem.content, fileName, memoItem.count]);
 		} else {
 			memoItem.content = content
 			memoItem.count = 0
 			memoItem.liked_usernames = []
+			await client.query(`INSERT INTO memos (content,image,count,created_at,updated_at) VALUES ($1,$2,$3,NOW(),NOW())`, [memoItem.content, null, memoItem.count]);
 		}
-		data.push(memoItem)
-		// data.push({
-		//     content: content,
-		//     image: fileName ? fileName : null
-		// });
-		await jsonfile.writeFile(path.join('public', 'memos.json'), data, {
-			spaces: 2
-		})
+
+
+		// data.push(memoItem)
+		// // data.push({
+		// //     content: content,
+		// //     image: fileName ? fileName : null
+		// // });
+		// await jsonfile.writeFile(path.join('public', 'memos.json'), data, {
+		// 	spaces: 2
+		// })
 		// res.status(200)//.send("submitted memo")
+
+		io.emit("new-memo", { message: "New Memo Added" });
 		res.status(200).json({ memoPosted: true })
 	})
+
 	// next()
 	// res.redirect("/")
 })
@@ -74,25 +84,28 @@ memoRoutes.put(
 	'/',
 	isLoggedIn,
 	async (req: express.Request, res: express.Response) => {
-		let index = req.body.index
+		let memoId = req.body.memoId
 		let content = req.body.content
-		// console.log(index);
+		// console.log(memoId);
 		// console.log(content);
 		try {
-			const data = await jsonfile.readFile(
-				path.join('public', 'memos.json')
-			)
+			// const data = await jsonfile.readFile(
+			// 	path.join('public', 'memos.json')
+			// )
+			// let data = await client.query(/*sql*/`SELECT * from memos`)
 			// console.log(data[index]);
-			data[index].content = content
+			// data[index].content = content
 			// console.log(data);
-			await jsonfile.writeFile(path.join('public', 'memos.json'), data, {
-				spaces: 2
-			})
+			// await jsonfile.writeFile(path.join('public', 'memos.json'), data, {
+			// 	spaces: 2
+			// })
+			await client.query(/*sql*/`UPDATE memos SET content=($1) WHERE id=($2)`,
+				[content, memoId]);
 			res.json({ memoUpdated: true })
 			// res.status(200).json(data);
 		} catch (err: any) {
 			res.status(400).send("Update Memo Error: " + err.message)
-        	logger.error(err.message)
+			logger.error(err.message)
 		}
 	}
 )
@@ -101,26 +114,28 @@ memoRoutes.delete(
 	'/',
 	isLoggedIn,
 	async (req: express.Request, res: express.Response) => {
-		let index = req.body.index
+		let memoId = req.body.memoId
 		// let content = req.body.content;
 		// console.log(index);
 		// console.log(content);
 		try {
-			const data = await jsonfile.readFile(
-				path.join('public', 'memos.json')
-			)
-			// console.log(data[index]);
-			data.splice(index, 1)
-			// data[index].content = content;
-			// console.log(data);
-			await jsonfile.writeFile(path.join('public', 'memos.json'), data, {
-				spaces: 2
-			})
+			// const data = await jsonfile.readFile(
+			// 	path.join('public', 'memos.json')
+			// )
+			// // console.log(data[index]);
+			// data.splice(index, 1)
+			// // data[index].content = content;
+			// // console.log(data);
+			// await jsonfile.writeFile(path.join('public', 'memos.json'), data, {
+			// 	spaces: 2
+			// })
+			await client.query(/*sql*/`DELETE FROM memos WHERE id=($1)`,
+				[memoId]);
 			res.json({ memoDeleted: true })
 			// res.status(200).json(data);
-		} catch (err: any){
+		} catch (err: any) {
 			res.status(400).send("Delete Memo Error: " + err.message)
-        	logger.error(err.message)
+			logger.error(err.message)
 		}
 	}
 )
@@ -129,35 +144,44 @@ memoRoutes.put(
 	'/like',
 	isLoggedIn,
 	async (req: express.Request, res: express.Response) => {
-		let index = req.body.index
+		let memoId = req.body.memoId
 		// let count = req.body.count;
 		let username = req.session.username
+		let userId = req.session.userId
 		// console.log(index);
 		// console.log(count);
 		try {
-			const data = await jsonfile.readFile(
-				path.join('public', 'memos.json')
-			)
+			// const data = await jsonfile.readFile(
+			// 	path.join('public', 'memos.json')
+			// )
 			// console.log(data[index]);
 			// console.log(data[index].liked_usernames.includes(username));
-			if (data[index].liked_usernames.includes(username)) {
-				data[index].liked_usernames = data[
-					index
-				].liked_usernames.filter((item: string) => {
-					return item !== username
-				})
-			} else {
-				data[index].liked_usernames.push(username)
+			let existingData = await client.query(/*sql*/`SELECT * FROM likes WHERE id=($1)`,
+				[memoId]);
+			if (existingData) {
+				await client.query(/*sql*/`INSERT INTO likes (user_id, memo_id) VALUES ($1,$2)`,
+					[userId, memoId]);
 			}
-			data[index].count = data[index].liked_usernames.length
-			await jsonfile.writeFile(path.join('public', 'memos.json'), data, {
-				spaces: 2
-			})
+
+
+			// if (data[index].liked_usernames.includes(username)) {
+			// 	data[index].liked_usernames = data[
+			// 		index
+			// 	].liked_usernames.filter((item: string) => {
+			// 		return item !== username
+			// 	})
+			// } else {
+			// 	data[index].liked_usernames.push(username)
+			// }
+			// data[index].count = data[index].liked_usernames.length
+			// await jsonfile.writeFile(path.join('public', 'memos.json'), data, {
+			// 	spaces: 2
+			// })
 			res.status(200).json({ likeUpdated: true })
 			// res.status(200).json(data);
-		} catch (err: any){
+		} catch (err: any) {
 			res.status(400).send("Like Memo Error: " + err.message)
-        	logger.error(err.message)
+			logger.error(err.message)
 		}
 	}
 )

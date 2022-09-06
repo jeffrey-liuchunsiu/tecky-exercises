@@ -1,3 +1,25 @@
 {
-	"typescript.tsdk": "node_modules\\typescript\\lib"
+	"typescript.tsdk": "node_modules\\typescript\\lib",
+	"sqltools.connections": [
+		{
+			"previewLimit": 50,
+			"server": "localhost",
+			"port": 5432,
+			"driver": "PostgreSQL",
+			"name": "WSP009",
+			"database": "postgres",
+			"username": "postgres",
+			"password": "postgres"
+		},
+		{
+			"previewLimit": 50,
+			"server": "localhost",
+			"port": 5432,
+			"driver": "PostgreSQL",
+			"name": "WSP009 ex1",
+			"database": "memo_wall",
+			"username": "postgres",
+			"password": "postgres"
+		}
+	]
 }
