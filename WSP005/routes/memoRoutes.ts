@@ -20,7 +20,7 @@ memoRoutes.get('/', async (req: express.Request, res: express.Response) => {
 	try {
 		// await client.connect()
 		// const data = await jsonfile.readFile(path.join('public', 'memos.json'))
-		let data = await client.query(/*sql*/`SELECT * from memos`)
+		let data = await client.query(/*sql*/`SELECT * from memos Order by id`)
 		res.status(200).json(data.rows)
 
 	} catch (err: any) {
@@ -146,7 +146,7 @@ memoRoutes.put(
 	async (req: express.Request, res: express.Response) => {
 		let memoId = req.body.memoId
 		// let count = req.body.count;
-		let username = req.session.username
+		// let username = req.session.username
 		let userId = req.session.userId
 		// console.log(index);
 		// console.log(count);
@@ -156,13 +156,22 @@ memoRoutes.put(
 			// )
 			// console.log(data[index]);
 			// console.log(data[index].liked_usernames.includes(username));
-			let existingData = await client.query(/*sql*/`SELECT * FROM likes WHERE id=($1)`,
-				[memoId]);
-			if (existingData) {
+			let userLikeStatus = await client.query(/*sql*/`SELECT * FROM likes WHERE user_id=($1) AND memo_id=($2)`,
+				[userId, memoId]);
+			console.log(userLikeStatus.rows);
+
+			if (userLikeStatus.rowCount > 0) {
+				await client.query(/*sql*/`DELETE FROM likes WHERE user_id=($1) AND memo_id=($2)`,
+					[userId, memoId]);
+			} else {
 				await client.query(/*sql*/`INSERT INTO likes (user_id, memo_id) VALUES ($1,$2)`,
 					[userId, memoId]);
 			}
-
+			let memoLikedStatus = await client.query(/*sql*/`SELECT * FROM likes WHERE memo_id=($1)`,
+				[memoId]);
+			console.log(memoLikedStatus.rows);
+			await client.query(/*sql*/`Update memos set count=($1) WHERE id=($2)`,
+				[memoLikedStatus.rowCount, memoId]);
 
 			// if (data[index].liked_usernames.includes(username)) {
 			// 	data[index].liked_usernames = data[

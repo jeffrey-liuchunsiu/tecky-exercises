@@ -238,11 +238,13 @@ app.use('/login', loginRoutes)
 // })
 
 app.get('/likedmemo', isLoggedIn, async (req: Request, res: Response, next) => {
-	let username = req.session.username
+	// let username = req.session.username
+	let userId = req.session.userId
+	// console.log(userId)
 	// console.log(username);
 
 	try {
-		let data = await jsonfile.readFile(path.join('public', 'memos.json'))
+		// let data = await jsonfile.readFile(path.join('public', 'memos.json'))
 		// let data: any = await client.query(/*sql*/`SELECT * from memos`)
 		// type Memo = {
 		//     content?: string,
@@ -251,12 +253,16 @@ app.get('/likedmemo', isLoggedIn, async (req: Request, res: Response, next) => {
 		//     liked_usernames?: Array<string>
 		// }
 
-		let result = data.filter((memo: any) => {
-			return memo.liked_usernames.includes(username)
-		})
-		// console.log(result);
+		// let result = data.filter((memo: any) => {
+		// 	return memo.liked_usernames.includes(username)
+		// })
+		let result = await client.query(/*sql*/`SELECT * from users 
+		INNER JOIN likes on likes.user_id = users.id
+		INNER JOIN memos on likes.memo_id = memos.id
+		WHERE user_id = ($1)`, [userId])
+		// console.log(result.rows);
 
-		res.status(200).json(result)
+		res.status(200).json(result.rows)
 		// res.status(200).json(data);
 	} catch {
 		res.status(400).sendFile(path.resolve('./public/404.html'))

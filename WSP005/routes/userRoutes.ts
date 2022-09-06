@@ -26,6 +26,9 @@ loginRoutes.post('/', async (req: express.Request, res: express.Response) => {
 		let userResult = await client.query(/*sql*/`SELECT * FROM users WHERE username=($1) AND password=($2)`,
 			[username, password]);
 
+		console.log(userResult.rowCount);
+
+
 		if (userResult.rowCount > 0) {
 			// for (let user of users) {
 			// 	// for (let key in password){
