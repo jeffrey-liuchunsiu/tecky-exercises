@@ -147,7 +147,12 @@ memoRoutes.put(
 		let memoId = req.body.memoId
 		// let count = req.body.count;
 		// let username = req.session.username
-		let userId = req.session.userId
+		let userId
+		if (req.session.user) {
+			userId = req.session.user.userId
+		} else {
+			return res.status(400).json({ Message: "Please login first" })
+		}
 		// console.log(index);
 		// console.log(count);
 		try {
@@ -158,7 +163,7 @@ memoRoutes.put(
 			// console.log(data[index].liked_usernames.includes(username));
 			let userLikeStatus = await client.query(/*sql*/`SELECT * FROM likes WHERE user_id=($1) AND memo_id=($2)`,
 				[userId, memoId]);
-			console.log(userLikeStatus.rows);
+			// console.log(userLikeStatus.rows);
 
 			if (userLikeStatus.rowCount > 0) {
 				await client.query(/*sql*/`DELETE FROM likes WHERE user_id=($1) AND memo_id=($2)`,
@@ -169,7 +174,7 @@ memoRoutes.put(
 			}
 			let memoLikedStatus = await client.query(/*sql*/`SELECT * FROM likes WHERE memo_id=($1)`,
 				[memoId]);
-			console.log(memoLikedStatus.rows);
+			// console.log(memoLikedStatus.rows);
 			await client.query(/*sql*/`Update memos set count=($1) WHERE id=($2)`,
 				[memoLikedStatus.rowCount, memoId]);
 

@@ -34,7 +34,7 @@ async function main() {
     // const data = XLSX.utils.sheet_to_json(dt.Sheets, { header: 1 });
 
 
-    console.log(usersData);
+    // console.log(usersData);
 
     for (let item of usersData) {
         // console.log(`INSERT INTO users (username,password) values ('${item.username}','${item.password}')`);

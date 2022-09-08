@@ -10,6 +10,27 @@ socket.on('new-memo', (data) => {
 	loadMemos()
 })
 
+// Get the modal
+let modal = document.querySelector("#winModal");
+
+// Get the button that opens the modal
+let loginBtn = document.querySelector(".login-button");
+
+// Get the <span> element that closes the modal
+let closeModal = document.querySelector(".close");
+
+let textModal = document.querySelector(".login-status");
+
+// When the user clicks the button, open the modal 
+loginBtn.onclick = function () {
+	modal.style.display = "block";
+}
+
+// When the user clicks on <span> (x), close the modal
+closeModal.onclick = function () {
+	modal.style.display = "none";
+}
+
 document
 	.querySelector('#memo-form')
 	.addEventListener('submit', async (event) => {
@@ -48,10 +69,11 @@ document
 	})
 
 document
-	.querySelector('#login-form')
-	.addEventListener('submit', async (event) => {
+	.querySelector('.login-submit')
+	.addEventListener('click', async (event) => {
 		event.preventDefault() // To prevent the form from submitting synchronously
-		const form = event.target
+		// const form = event.target
+		const form = document.querySelector("#login-form")
 		const formData = new FormData()
 		let username = form.username.value
 		// console.log("username: ", username);
@@ -66,15 +88,63 @@ document
 		// };
 		// console.log(form);
 		// //... create your form object with the form inputs
-		let res = await fetch('/login', {
+		// if (event.target && event.target.matches('.login-submit')) {
+		// 	console.log(`${event.target} has been clicked!`);
+		// }
+
+		let res = await fetch('/user/login', {
 			method: 'POST',
 			// body: JSON.stringify(formObject)
 			body: formData
 		})
-		if (res.status === 400) {
-			let toPage = await res.text()
-			// console.log("toPage = ", toPage);
-			window.location = toPage
+		if (res.status === 401) {
+			// let toPage = await res.text()
+			// // console.log("toPage = ", toPage);
+			// window.location = toPage
+			textModal.innerHTML = "Incorrect username or password"
+		} else if (res.status === 200) {
+			textModal.innerHTML = "Login Successful"
+		}
+		// // document.querySelector("#memo-input").innerHTML = "輸入内容"
+		// // Clear the form here
+	})
+
+document
+	.querySelector('.register-submit')
+	.addEventListener('click', async (event) => {
+		event.preventDefault() // To prevent the form from submitting synchronously
+		// const form = event.target
+		const form = document.querySelector("#login-form")
+		const formData = new FormData()
+		let username = form.username.value
+		// console.log("username: ", username);
+		let password = form.password.value
+		// console.log("password: ", password);
+		formData.append('username', username)
+		formData.append('password', password)
+		// let textarea = document.querySelector("#memo-form")
+		// console.log(formData);
+		// let formObject = {
+		//     content: textarea.value
+		// };
+		// console.log(form);
+		// //... create your form object with the form inputs
+		// if (event.target && event.target.matches('.login-submit')) {
+		// 	console.log(`${event.target} has been clicked!`);
+		// }
+
+		let res = await fetch('/user/register', {
+			method: 'POST',
+			// body: JSON.stringify(formObject)
+			body: formData
+		})
+		if (res.status === 401) {
+			// let toPage = await res.text()
+			// // console.log("toPage = ", toPage);
+			// window.location = toPage
+			textModal.innerHTML = "Register Unsuccessful"
+		} else if (res.status === 200) {
+			textModal.innerHTML = "Register Successful"
 		}
 		// // document.querySelector("#memo-input").innerHTML = "輸入内容"
 		// // Clear the form here
@@ -83,8 +153,8 @@ document
 document
 	.querySelector('.liked-word')
 	.addEventListener('click', async (event) => {
-		console.log('filter')
-		let res = await fetch('/likedmemo')
+		// console.log('filter')
+		let res = await fetch('/user/likedmemo')
 		// console.log(result);
 		if (res.status === 400) {
 			let toPage = await res.text()
@@ -98,8 +168,8 @@ document
 document
 	.querySelector('.liked-button')
 	.addEventListener('click', async (event) => {
-		console.log('filter')
-		let res = await fetch('/likedmemo')
+		// console.log('filter')
+		let res = await fetch('/user/likedmemo')
 		// console.log(result);
 		if (res.status === 400) {
 			let toPage = await res.text()

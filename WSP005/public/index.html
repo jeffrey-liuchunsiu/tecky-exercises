@@ -37,19 +37,39 @@
 						<form id="login-form" method="POST" action="/login" enctype="multipart/form-data">
 							<div>
 								<input class="login-text" type="text" id="fname" name="username"
-									value="jeffrey.liu22@gmail.com" /><br />
+									value="jeffrey.liu@gmail.com" /><br />
 								<input class="login-text" type="password" id="lname" name="password"
 									value="1234" /><br />
-								<span class="button">
-									<input type="submit" value="提交" />
+								<span class="button login-button">
+									<input type="submit" class="login-submit" value="登入" />
+									<input type="submit" class="register-submit" value="註冊" />
 								</span>
-								<div class="login-via-google">
-									Login via Google
-								</div>
 							</div>
 						</form>
+						<div class="user-container">
+							<label for="login-form">管理員專用</label>
+							<p class="username">username: Dickson</p>
+							<img src="https://lh3.googleusercontent.com/a/AItbvmnvaOmlXDog6q_KIyN3qbH52ZipccLsZz4al8Gj=s96-c"
+								alt="" srcset="">
+
+							<!-- <a href="/user/logout" class="btn btn-error" value="登出"></a> -->
+							<form action="/user/logout">
+								<input type="submit" value="登出" />
+							</form>
+						</div>
+						<!-- The Modal -->
+						<div id="winModal" class="modal">
+
+							<!-- Modal content -->
+							<div class="modal-content">
+								<span class="close">&times;</span>
+								<p class="login-status">Login</p>
+							</div>
+
+						</div>
 					</div>
-					<div class="log-in-via-google"></div>
+					<div class="log-in-via-google"><a href="/connect/google" class="btn btn-success">Sign in With
+							Google</a></div>
 				</div>
 				<div>
 					<div class="liked-item">

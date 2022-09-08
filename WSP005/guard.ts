@@ -11,7 +11,7 @@ export const isLoggedIn = (
 
 	// console.log(req.session?.user);s
 
-	if (req.session?.user) {
+	if (req.session.user?.loggedIn) {
 		next()
 	} else {
 		// res.redirect("/");

@@ -6,16 +6,16 @@ import jsonfile from 'jsonfile'
 import formidable from 'formidable'
 import fs from 'fs'
 import { memoRoutes } from './routes/memoRoutes'
-import { loginRoutes } from './routes/userRoutes'
+import { userRoutes } from './routes/userRoutes'
 import { isLoggedIn } from './guard'
 import { logger } from './logger'
 import { Client } from 'pg';
 import dotenv from 'dotenv';
 import http from 'http';
 import { Server as SocketIO } from 'socket.io';
+import grant from 'grant';
 
 dotenv.config();
-
 export const client = new Client({
 	database: process.env.DB_NAME,
 	user: process.env.DB_USERNAME,
@@ -36,15 +36,33 @@ app.use(
 		saveUninitialized: true
 	})
 )
+//grant need to be after session is created
+const grantExpress = grant.express({
+	"defaults": {
+		"origin": "http://localhost:8080",
+		"transport": "session",
+		"state": true,
+	},
+	"google": {
+		"key": process.env.GOOGLE_CLIENT_ID || "",
+		"secret": process.env.GOOGLE_CLIENT_SECRET || "",
+		"scope": ["profile", "email"],
+		"callback": "/user/login/google"
+	}
+});
+app.use(grantExpress as express.RequestHandler);
 
 declare module 'express-session' {
 	interface SessionData {
-		username?: string
-		password?: number
-		counter?: number
-		user?: boolean
-		liked_usernames?: Array<string>
-		userId?: number
+		user?: {
+			loggedIn?: boolean
+			username?: string
+			password?: number
+			counter?: number
+			liked_usernames?: Array<string>
+			userId?: number
+		}
+		grant?: any
 	}
 }
 
@@ -160,7 +178,7 @@ app.use(function (req: Request, res: Response, next) {
 
 app.use('/memos', memoRoutes)
 
-app.use('/login', loginRoutes)
+app.use('/user', userRoutes)
 
 // const isLoggedIn = (
 //     req: express.Request,
@@ -237,37 +255,37 @@ app.use('/login', loginRoutes)
 //     }
 // })
 
-app.get('/likedmemo', isLoggedIn, async (req: Request, res: Response, next) => {
-	// let username = req.session.username
-	let userId = req.session.userId
-	// console.log(userId)
-	// console.log(username);
+// app.get('/likedmemo', isLoggedIn, async (req: Request, res: Response, next) => {
+// 	// let username = req.session.username
+// 	let userId = req.session.userId
+// 	// console.log(userId)
+// 	// console.log(username);
 
-	try {
-		// let data = await jsonfile.readFile(path.join('public', 'memos.json'))
-		// let data: any = await client.query(/*sql*/`SELECT * from memos`)
-		// type Memo = {
-		//     content?: string,
-		//     image?: string,
-		//     count?: number,
-		//     liked_usernames?: Array<string>
-		// }
+// 	try {
+// 		// let data = await jsonfile.readFile(path.join('public', 'memos.json'))
+// 		// let data: any = await client.query(/*sql*/`SELECT * from memos`)
+// 		// type Memo = {
+// 		//     content?: string,
+// 		//     image?: string,
+// 		//     count?: number,
+// 		//     liked_usernames?: Array<string>
+// 		// }
 
-		// let result = data.filter((memo: any) => {
-		// 	return memo.liked_usernames.includes(username)
-		// })
-		let result = await client.query(/*sql*/`SELECT * from users 
-		INNER JOIN likes on likes.user_id = users.id
-		INNER JOIN memos on likes.memo_id = memos.id
-		WHERE user_id = ($1)`, [userId])
-		// console.log(result.rows);
+// 		// let result = data.filter((memo: any) => {
+// 		// 	return memo.liked_usernames.includes(username)
+// 		// })
+// 		let result = await client.query(/*sql*/`SELECT * from users 
+// 		INNER JOIN likes on likes.user_id = users.id
+// 		INNER JOIN memos on likes.memo_id = memos.id
+// 		WHERE user_id = ($1)`, [userId])
+// 		// console.log(result.rows);
 
-		res.status(200).json(result.rows)
-		// res.status(200).json(data);
-	} catch {
-		res.status(400).sendFile(path.resolve('./public/404.html'))
-	}
-})
+// 		res.status(200).json(result.rows)
+// 		// res.status(200).json(data);
+// 	} catch {
+// 		res.status(400).sendFile(path.resolve('./public/404.html'))
+// 	}
+// })
 
 // app.use('/memos', memoRoutes);
 
