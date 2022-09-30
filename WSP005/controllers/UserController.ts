@@ -18,43 +18,13 @@ export default class UserService {
         return users;
     }
 
-    async login(): Promise<any> {
-        try {
-            form.parse(req, async (err, fields, files) => {
-                let username = fields.username
-                let password = Array.isArray(fields.password) ? fields.password[0] : fields.password
+    async login(username): Promise<any> {
 
-                if (!username || !password) {
-                    res.status(401).json({ message: "Incorrect username or password" })
-                    return
-                }
-
-                let user = (await client.query(/*sql*/`Select * from users where username = ($1)`, [username])).rows[0]
-
-                const match = await checkPassword(password, user.password);
-                req.session.user = {}
-                if (match) {
-                    // if (req.session) {
-                    // 	req.session.loggedIn = true
-                    // }
-                    // if(req.session.user){
-                    req.session.user.loggedIn = true
-                    // }
-                    req.session.user.username = user.username
-                    req.session.user.userId = user.id;
-                    req.session.save()
-                    res.status(200).json({ message: "Login Successful" })
-                    console.log("req.session", req.session);
-                    return
-                    // return res.redirect('/'); // To the protected page.
-                } else {
-                    return res.status(401).json({ message: "Incorrect username or password" })
-                }
-
-            })
-        } catch {
-            return res.status(401).json({ message: "Incorrect username or password" })
-        }
+        const user: User[] = await this.knex
+            .select("*")
+            .from("users")
+            .where("username", username);
+        return user;
     }
 
     // async getUsers(): Promise<User[]> {
@@ -117,7 +87,8 @@ let userService = new UserService()
 async function main() {
 
     let users = await userService.getUsers()
-    console.log(users);
+    let user = await userService.login("jeffrey@gmail.com")
+    console.log(user);
 }
 
 main()
