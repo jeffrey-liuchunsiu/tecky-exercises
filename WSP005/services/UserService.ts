@@ -72,16 +72,16 @@ export default class UserService {
         //     `insert into users (username, password) values ($1, $2)`,
         //     [username, hashedPasword]
         // )
-        let userId = await this.knex
+        let userId: number = (await this.knex
             .insert([{
                 "username": username,
                 "password": hashedPassword,
-                "created_at": Date.now(),
-                "updated_at": Date.now()
+                "created_at": new Date().toISOString(),
+                "updated_at": new Date().toISOString()
             }
             ])
             .into("users")
-            .returning("id");
+            .returning("id"))[0];
         return userId
     }
     // async likedMemos(userId: number) {
@@ -109,12 +109,12 @@ export default class UserService {
     //     return dbUser;
     // }
 
-    async getUser(username: string): Promise<User[]> {
+    async getUser(username: string): Promise<User> {
 
-        const user: User[] = await this.knex
+        const user: User = (await this.knex
             .select("*")
             .from("users")
-            .where("username", username);
+            .where("username", username))[0];
         return user;
     }
 
@@ -129,19 +129,19 @@ export default class UserService {
 
 let userService = new UserService()
 
-async function main() {
+// async function main() {
 
-    // let users = await userService.getUsers()
-    // let user = await userService.login("jeffrey@gmail.com")
-    // let memo = await userService.likedMemos(14)
+//     // let users = await userService.getUsers()
+//     // let user = await userService.login("jeffrey@gmail.com")
+//     // let memo = await userService.likedMemos(14)
 
-    // let userInput = {
-    //     "username": "jeffrey44@gmail.com",
-    //     "password": "helloworld",
-    // }
-    // let userId = await userService.register("jeffrey44@gmail.com", "helloworld")
-    let user = await userService.getUser("jeffrey44@gmail.com")
-    console.log(user);
-}
+//     // let userInput = {
+//     //     "username": "jeffrey44@gmail.com",
+//     //     "password": "helloworld",
+//     // }
+//     // let userId = await userService.register("jeffrey44@gmail.com", "helloworld")
+//     let user = await userService.getUser("jeffrey44@gmail.com")
+//     console.log(user);
+// }
 
-main()
+// main()

@@ -6,7 +6,7 @@ import jsonfile from 'jsonfile'
 import formidable from 'formidable'
 import fs from 'fs'
 import { memoRoutes } from './routes/memoRoutes'
-import { userRoutes } from './routes/userRoutes'
+import { userRoutes, initializeUserRoutes } from './routes/userRoutes'
 import { isLoggedIn } from './guard'
 import { logger } from './logger'
 import { Client } from 'pg';
@@ -93,6 +93,8 @@ export const form = formidable({
 		return `${originalName}-${timestamp}.${ext}`
 	}
 })
+
+initializeUserRoutes(io)
 
 app.use(function (req: Request, res: Response, next) {
 	let date = new Date()

@@ -9,17 +9,19 @@ import fetch from 'cross-fetch';
 import crypto from 'crypto'
 import { logger } from '../logger'
 import UserController from '../controllers/UserController'
+import UserService from '../services/UserService'
+import { Server as SocketIO } from 'socket.io'
 
 
-export function initialize(client: Client, io: SocketIO) {
-	const userService = new UserService(client);
+export function initializeUserRoutes(io: SocketIO) {
+	const userService = new UserService();
 	const userController = new UserController(userService, io);
 
 	// userRoutes.get('/', userController.getUsers)
-	// userRoutes.post('/register', userController.register)
-	// userRoutes.get('/liked-memo/:userId', userController.likedMemos)
+	userRoutes.post('/register', userController.register)
+	userRoutes.get('/liked-memo', userController.likedMemos)
 	userRoutes.post('/login', userController.login)
-	// userRoutes.get('/login/google', userController.loginGoogle)
+	userRoutes.get('/login/google', userController.loginGoogle)
 	// userRoutes.get('/logout', userController.logout)
 	// userRoutes.get('/me', userController.me)
 
@@ -155,103 +157,103 @@ export function initialize(client: Client, io: SocketIO) {
 // 	// })
 // })
 
-userRoutes.get('/likedmemo', async (req: express.Request, res: express.Response) => {
-	// app.get('/likedmemo', isLoggedIn, async (req: Request, res: Response, next) => {
-	// let username = req.session.username
-	let userId
-	if (req.session.user) {
-		userId = req.session.user.userId
-	} else {
-		return res.status(400).json({ Message: "Please login first" })
-	}
-	// console.log(userId)
-	// console.log(username);
+// userRoutes.get('/likedmemo', async (req: express.Request, res: express.Response) => {
+// 	// app.get('/likedmemo', isLoggedIn, async (req: Request, res: Response, next) => {
+// 	// let username = req.session.username
+// 	let userId
+// 	if (req.session.user) {
+// 		userId = req.session.user.userId
+// 	} else {
+// 		return res.status(400).json({ Message: "Please login first" })
+// 	}
+// 	// console.log(userId)
+// 	// console.log(username);
 
-	try {
-		// let data = await jsonfile.readFile(path.join('public', 'memos.json'))
-		// let data: any = await client.query(/*sql*/`SELECT * from memos`)
-		// type Memo = {
-		//     content?: string,
-		//     image?: string,
-		//     count?: number,
-		//     liked_usernames?: Array<string>
-		// }
+// 	try {
+// 		// let data = await jsonfile.readFile(path.join('public', 'memos.json'))
+// 		// let data: any = await client.query(/*sql*/`SELECT * from memos`)
+// 		// type Memo = {
+// 		//     content?: string,
+// 		//     image?: string,
+// 		//     count?: number,
+// 		//     liked_usernames?: Array<string>
+// 		// }
 
-		// let result = data.filter((memo: any) => {
-		// 	return memo.liked_usernames.includes(username)
-		// })
-		let result = await client.query(/*sql*/`SELECT * from users 
-		INNER JOIN likes on likes.user_id = users.id
-		INNER JOIN memos on likes.memo_id = memos.id
-		WHERE user_id = ($1)`, [userId])
-		// console.log(result.rows);
+// 		// let result = data.filter((memo: any) => {
+// 		// 	return memo.liked_usernames.includes(username)
+// 		// })
+// 		let result = await client.query(/*sql*/`SELECT * from users
+// 		INNER JOIN likes on likes.user_id = users.id
+// 		INNER JOIN memos on likes.memo_id = memos.id
+// 		WHERE user_id = ($1)`, [userId])
+// 		// console.log(result.rows);
 
-		res.status(200).json(result.rows)
-		// res.status(200).json(data);
-	} catch {
-		res.status(400).sendFile(path.resolve('./public/404.html'))
-	}
-})
+// 		res.status(200).json(result.rows)
+// 		// res.status(200).json(data);
+// 	} catch {
+// 		res.status(400).sendFile(path.resolve('./public/404.html'))
+// 	}
+// })
 
 
-userRoutes.post('/register', async (req: express.Request, res: express.Response) => {
-	try {
-		form.parse(req, async (err, fields, files) => {
-			let username = fields.username
-			let password = Array.isArray(fields.password) ? fields.password[0] : fields.password
-			console.log("username: ", username);
-			console.log("password: ", password);
+// userRoutes.post('/register', async (req: express.Request, res: express.Response) => {
+// 	try {
+// 		form.parse(req, async (err, fields, files) => {
+// 			let username = fields.username
+// 			let password = Array.isArray(fields.password) ? fields.password[0] : fields.password
+// 			console.log("username: ", username);
+// 			console.log("password: ", password);
 
-			let hashedPassword = await hashPassword(password)
+// 			let hashedPassword = await hashPassword(password)
 
-			let result = await client.query(/*sql*/`Insert into users (username, password) values ($1,$2) Returning id`, [username, hashedPassword])
-			console.log(result);
+// 			let result = await client.query(/*sql*/`Insert into users (username, password) values ($1,$2) Returning id`, [username, hashedPassword])
+// 			console.log(result);
 
-			req.session.user = {}
-			req.session.user.loggedIn = true
-			req.session.user.userId = result.rows[0].id;
-			res.status(200).json({ message: "Register Successful" })
-		})
-	} catch (err) {
-		logger.error(err)
-		res.status(401).json({ message: "Register Unsuccessful" })
-	}
-})
+// 			req.session.user = {}
+// 			req.session.user.loggedIn = true
+// 			req.session.user.userId = result.rows[0].id;
+// 			res.status(200).json({ message: "Register Successful" })
+// 		})
+// 	} catch (err) {
+// 		logger.error(err)
+// 		res.status(401).json({ message: "Register Unsuccessful" })
+// 	}
+// })
 
-userRoutes.get('/login/google', async (req: express.Request, res: express.Response) => {
-	console.log("login google");
+// userRoutes.get('/login/google', async (req: express.Request, res: express.Response) => {
+// 	console.log("login google");
 
-	const accessToken = req.session?.['grant'].response.access_token;
-	const fetchRes = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-		method: "get",
-		headers: {
-			"Authorization": `Bearer ${accessToken}`
-		}
-	});
-	const result = await fetchRes.json();
-	// console.log(result);
+// 	const accessToken = req.session?.['grant'].response.access_token;
+// 	const fetchRes = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+// 		method: "get",
+// 		headers: {
+// 			"Authorization": `Bearer ${accessToken}`
+// 		}
+// 	});
+// 	const result = await fetchRes.json();
+// 	// console.log(result);
 
-	const users = (await client.query(`SELECT * FROM users WHERE users.username = $1`, [result.email])).rows;
-	let user = users[0];
-	// console.log(user);
+// 	const users = (await client.query(`SELECT * FROM users WHERE users.username = $1`, [result.email])).rows;
+// 	let user = users[0];
+// 	// console.log(user);
 
-	if (!user) {
-		// Create the user when the user does not exist
-		// let password = hashPassword("blablabla")
-		const randomString = crypto.randomBytes(32).toString('hex')
-		let password = await hashPassword(randomString)
+// 	if (!user) {
+// 		// Create the user when the user does not exist
+// 		// let password = hashPassword("blablabla")
+// 		const randomString = crypto.randomBytes(32).toString('hex')
+// 		let password = await hashPassword(randomString)
 
-		user = (await client.query(`INSERT INTO users (username,password,created_at,updated_at) 
-	            VALUES ($1,$2,NOW(),NOW()) RETURNING *`,
-			[result.email, password])).rows[0]
-		console.log(user);
+// 		user = (await client.query(`INSERT INTO users (username,password,created_at,updated_at)
+// 	            VALUES ($1,$2,NOW(),NOW()) RETURNING *`,
+// 			[result.email, password])).rows[0]
+// 		console.log(user);
 
-	}
-	req.session.user = {}
-	// if(req.session){
-	req.session.user.loggedIn = true
-	req.session.user.userId = user.id
-	// }
-	// return res.status(200).json({ message: "Google Login Successful" })
-	return res.redirect('/')
-})
+// 	}
+// 	req.session.user = {}
+// 	// if(req.session){
+// 	req.session.user.loggedIn = true
+// 	req.session.user.userId = user.id
+// 	// }
+// 	// return res.status(200).json({ message: "Google Login Successful" })
+// 	return res.redirect('/')
+// })

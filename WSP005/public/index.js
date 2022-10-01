@@ -3,7 +3,7 @@ window.onload = () => {
 	// test()
 }
 
-const socket = io.connect();
+const socket = io.connect()
 socket.on('new-memo', (data) => {
 	// data has the content {msg:"Hello Client"}
 	// console.log(data)
@@ -11,24 +11,24 @@ socket.on('new-memo', (data) => {
 })
 
 // Get the modal
-let modal = document.querySelector("#winModal");
+let modal = document.querySelector('#winModal')
 
 // Get the button that opens the modal
-let loginBtn = document.querySelector(".login-button");
+let loginBtn = document.querySelector('.login-button')
 
 // Get the <span> element that closes the modal
-let closeModal = document.querySelector(".close");
+let closeModal = document.querySelector('.close')
 
-let textModal = document.querySelector(".login-status");
+let textModal = document.querySelector('.login-status')
 
-// When the user clicks the button, open the modal 
+// When the user clicks the button, open the modal
 loginBtn.onclick = function () {
-	modal.style.display = "block";
+	modal.style.display = 'block'
 }
 
 // When the user clicks on <span> (x), close the modal
 closeModal.onclick = function () {
-	modal.style.display = "none";
+	modal.style.display = 'none'
 }
 
 document
@@ -73,7 +73,7 @@ document
 	.addEventListener('click', async (event) => {
 		event.preventDefault() // To prevent the form from submitting synchronously
 		// const form = event.target
-		const form = document.querySelector("#login-form")
+		const form = document.querySelector('#login-form')
 		const formData = new FormData()
 		let username = form.username.value
 		// console.log("username: ", username);
@@ -101,9 +101,9 @@ document
 			// let toPage = await res.text()
 			// // console.log("toPage = ", toPage);
 			// window.location = toPage
-			textModal.innerHTML = "Incorrect username or password"
+			textModal.innerHTML = 'Incorrect username or password'
 		} else if (res.status === 200) {
-			textModal.innerHTML = "Login Successful"
+			textModal.innerHTML = 'Login Successful'
 		}
 		// // document.querySelector("#memo-input").innerHTML = "輸入内容"
 		// // Clear the form here
@@ -114,7 +114,7 @@ document
 	.addEventListener('click', async (event) => {
 		event.preventDefault() // To prevent the form from submitting synchronously
 		// const form = event.target
-		const form = document.querySelector("#login-form")
+		const form = document.querySelector('#login-form')
 		const formData = new FormData()
 		let username = form.username.value
 		// console.log("username: ", username);
@@ -142,9 +142,9 @@ document
 			// let toPage = await res.text()
 			// // console.log("toPage = ", toPage);
 			// window.location = toPage
-			textModal.innerHTML = "Register Unsuccessful"
+			textModal.innerHTML = 'Register Unsuccessful'
 		} else if (res.status === 200) {
-			textModal.innerHTML = "Register Successful"
+			textModal.innerHTML = 'Register Successful'
 		}
 		// // document.querySelector("#memo-input").innerHTML = "輸入内容"
 		// // Clear the form here
@@ -154,7 +154,7 @@ document
 	.querySelector('.liked-word')
 	.addEventListener('click', async (event) => {
 		// console.log('filter')
-		let res = await fetch('/user/likedmemo')
+		let res = await fetch('/user/liked-memo')
 		// console.log(result);
 		if (res.status === 400) {
 			let toPage = await res.text()
@@ -169,7 +169,7 @@ document
 	.querySelector('.liked-button')
 	.addEventListener('click', async (event) => {
 		// console.log('filter')
-		let res = await fetch('/user/likedmemo')
+		let res = await fetch('/user/liked-memo')
 		// console.log(result);
 		if (res.status === 400) {
 			let toPage = await res.text()
@@ -235,7 +235,9 @@ export async function loadMemos(data) {
 	for (let index in memoDivs) {
 		const memoDiv = memoDivs[index]
 		// console.log(memoDiv);
-		let memoId = memoDiv.getElementsByTagName('textarea')[0].className.split('-')[3]
+		let memoId = memoDiv
+			.getElementsByTagName('textarea')[0]
+			.className.split('-')[3]
 		memoDiv
 			.querySelector('.edit')
 			.addEventListener('click', async (event) => {

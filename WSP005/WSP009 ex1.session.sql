@@ -2,7 +2,8 @@ CREATE TABLE memos (
     id SERIAL primary key,
     content TEXT,
     image VARCHAR(255),
-    count created_at TIMESTAMP default now(),
+    count integer,
+    created_at TIMESTAMP default now(),
     updated_at TIMESTAMP default now()
 );
 CREATE TABLE users (
