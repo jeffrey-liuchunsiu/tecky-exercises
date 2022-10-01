@@ -8,135 +8,152 @@ import { checkPassword, hashPassword } from '../hash';
 import fetch from 'cross-fetch';
 import crypto from 'crypto'
 import { logger } from '../logger'
-
-userRoutes.post('/login', async (req: express.Request, res: express.Response) => {
-
-	form.parse(req, async (err: any, fields: any, files: any) => {
-		try {
-			const username = fields.username;
-			const password = fields.password;
-
-			// let password: string = fields.password
-			// console.log("username: ", useremail);
-			// console.log("password: ", password);
-
-			if (!username || !password) {
-				res.status(401).json({ message: "Incorrect email or password" });
-				return;
-			}
-
-			let user = (await client.query(/*sql*/ `Select * from users where username = ($1)`, [username])).rows[0];
-			console.log(user);
-			if (!user || Object.keys(user).length === 0) {
-				res.status(401).json({ message: "Incorrect email or password" });
-				return;
-			}
-
-			const match = await checkPassword(password, user.password);
-			// console.log(match);
-
-			req.session.user = {};
-			if (!match) {
-				res.status(401).json({ message: "Incorrect username or password" });
-				return;
-			}
-
-			req.session.user.loggedIn = true;
-			req.session.user.username = user.username;
-			// req.session.user.useremail = user.useremail;
-			req.session.user.userId = user.id;
-			// req.session.user.userimage = user.image;
-
-			// req.session.user.password = user.password;
-			req.session.save();
-			res.json({ message: "Login Successful", data: { user: req.session["user"] } });
-			console.log("req.session", req.session);
-		} catch (err) {
-			console.log(err);
-
-			res.status(500).json({ message: "Internal Server error" });
-		}
-	});
-
-	// form.parse(req, async (err, fields, files) => {
-	// 	// if(files.length >0)
-	// 	// console.log(fields.content);
-	// 	let username = fields.username
-	// 	// let file = Array.isArray(files.image) ? files.image[0] : files.image
-	// 	let password = Array.isArray(fields.password) ? fields.password[0] : fields.password
-	// 	// let password: string = fields.password
-	// 	// console.log("username: ", username);
-	// 	// console.log("password: ", password);
-
-	// 	if (!username || !password) {
-	// 		res.status(401).json({ message: "Incorrect username or password" })
-	// 		return
-	// 	}
-
-	// 	let user = (await client.query(/*sql*/`Select * from users where username = ($1)`, [username])).rows[0]
-	// 	try {
-	// 		const match = await checkPassword(password, user.password);
-	// 		req.session.user = {}
-	// 		if (match) {
-	// 			// if (req.session) {
-	// 			// 	req.session.loggedIn = true
-	// 			// }
-	// 			// if(req.session.user){
-	// 			req.session.user.loggedIn = true
-	// 			// }
-	// 			req.session.user.username = user.username
-	// 			req.session.user.userId = user.id;
-	// 			req.session.save()
-	// 			res.status(200).json({ message: "Login Successful" })
-	// 			console.log("req.session", req.session);
-	// 			return
-	// 			// return res.redirect('/'); // To the protected page.
-	// 		} else {
-	// 			return res.status(401).json({ message: "Incorrect username or password" })
-	// 		}
-	// 	} catch {
-	// 		return res.status(401).json({ message: "Incorrect username or password" })
-	// 	}
-
-	// 	// req.session.loggedIn = false
-	// 	// let userResult = await client.query(/*sql*/`SELECT * FROM users WHERE username=($1) AND password=($2)`,
-	// 	// 	[username, password]);
-
-	// 	// // console.log(userResult.rowCount);
+import UserController from '../controllers/UserController'
 
 
-	// 	// if (userResult.rowCount > 0) {
-	// 	// 	// for (let user of users) {
-	// 	// 	// 	// for (let key in password){
-	// 	// 	// 	if (user.username === username && user.password === password) {
-	// 	// 	// console.log("login successfully");
-	// 	// 	// let path1 = path.join("public", "admin.html")
-	// 	// 	// console.log(path1);
-	// 	// 	// res.redirect(path.join("", "admin.html"));
-	// 	// 	// req.session["user"] = true;
-	// 	// 	// req.session.user = true
-	// 	// 	req.session.loggedIn = true
-	// 	// 	req.session.username = userResult.rows[0].username
-	// 	// 	req.session.userId = userResult.rows[0].id;
-	// 	// 	req.session.save()
-	// 	// 	res.status(200)
-	// 	// 	// res.status(200).redirect("/admin.html");
-	// 	// 	// res.status(200).send("/");
-	// 	// 	// res.status(200).json({ message: "Login Successful" })
-	// 	// 	console.log("req.session", req.session);
-	// 	// 	return
-	// 	// 	// 	}
-	// 	// 	// }
-	// 	// }
-	// 	// // console.log(req.session["user"]);
-	// 	// // console.log("login fail");
+export function initialize(client: Client, io: SocketIO) {
+	const userService = new UserService(client);
+	const userController = new UserController(userService, io);
 
-	// 	// res.status(400).send('/login.html')
+	// userRoutes.get('/', userController.getUsers)
+	// userRoutes.post('/register', userController.register)
+	// userRoutes.get('/liked-memo/:userId', userController.likedMemos)
+	userRoutes.post('/login', userController.login)
+	// userRoutes.get('/login/google', userController.loginGoogle)
+	// userRoutes.get('/logout', userController.logout)
+	// userRoutes.get('/me', userController.me)
 
-	// 	// // res.redirect('/?msg=Login Failed')
-	// 	// // res.sendFile(path.resolve('./public/404.html'))
-	// })
-})
+}
+
+
+// userRoutes.post('/login', async (req: express.Request, res: express.Response) => {
+
+// 	form.parse(req, async (err: any, fields: any, files: any) => {
+// 		try {
+// 			const username = fields.username;
+// 			const password = fields.password;
+
+// 			// let password: string = fields.password
+// 			// console.log("username: ", useremail);
+// 			// console.log("password: ", password);
+
+// 			if (!username || !password) {
+// 				res.status(401).json({ message: "Incorrect email or password" });
+// 				return;
+// 			}
+
+// 			let user = (await client.query(/*sql*/ `Select * from users where username = ($1)`, [username])).rows[0];
+// 			console.log(user);
+// 			if (!user || Object.keys(user).length === 0) {
+// 				res.status(401).json({ message: "Incorrect email or password" });
+// 				return;
+// 			}
+
+// 			const match = await checkPassword(password, user.password);
+// 			// console.log(match);
+
+// 			req.session.user = {};
+// 			if (!match) {
+// 				res.status(401).json({ message: "Incorrect username or password" });
+// 				return;
+// 			}
+
+// 			req.session.user.loggedIn = true;
+// 			req.session.user.username = user.username;
+// 			// req.session.user.useremail = user.useremail;
+// 			req.session.user.userId = user.id;
+// 			// req.session.user.userimage = user.image;
+
+// 			// req.session.user.password = user.password;
+// 			req.session.save();
+// 			res.json({ message: "Login Successful", data: { user: req.session["user"] } });
+// 			console.log("req.session", req.session);
+// 		} catch (err) {
+// 			console.log(err);
+
+// 			res.status(500).json({ message: "Internal Server error" });
+// 		}
+// 	});
+
+// 	// form.parse(req, async (err, fields, files) => {
+// 	// 	// if(files.length >0)
+// 	// 	// console.log(fields.content);
+// 	// 	let username = fields.username
+// 	// 	// let file = Array.isArray(files.image) ? files.image[0] : files.image
+// 	// 	let password = Array.isArray(fields.password) ? fields.password[0] : fields.password
+// 	// 	// let password: string = fields.password
+// 	// 	// console.log("username: ", username);
+// 	// 	// console.log("password: ", password);
+
+// 	// 	if (!username || !password) {
+// 	// 		res.status(401).json({ message: "Incorrect username or password" })
+// 	// 		return
+// 	// 	}
+
+// 	// 	let user = (await client.query(/*sql*/`Select * from users where username = ($1)`, [username])).rows[0]
+// 	// 	try {
+// 	// 		const match = await checkPassword(password, user.password);
+// 	// 		req.session.user = {}
+// 	// 		if (match) {
+// 	// 			// if (req.session) {
+// 	// 			// 	req.session.loggedIn = true
+// 	// 			// }
+// 	// 			// if(req.session.user){
+// 	// 			req.session.user.loggedIn = true
+// 	// 			// }
+// 	// 			req.session.user.username = user.username
+// 	// 			req.session.user.userId = user.id;
+// 	// 			req.session.save()
+// 	// 			res.status(200).json({ message: "Login Successful" })
+// 	// 			console.log("req.session", req.session);
+// 	// 			return
+// 	// 			// return res.redirect('/'); // To the protected page.
+// 	// 		} else {
+// 	// 			return res.status(401).json({ message: "Incorrect username or password" })
+// 	// 		}
+// 	// 	} catch {
+// 	// 		return res.status(401).json({ message: "Incorrect username or password" })
+// 	// 	}
+
+// 	// 	// req.session.loggedIn = false
+// 	// 	// let userResult = await client.query(/*sql*/`SELECT * FROM users WHERE username=($1) AND password=($2)`,
+// 	// 	// 	[username, password]);
+
+// 	// 	// // console.log(userResult.rowCount);
+
+
+// 	// 	// if (userResult.rowCount > 0) {
+// 	// 	// 	// for (let user of users) {
+// 	// 	// 	// 	// for (let key in password){
+// 	// 	// 	// 	if (user.username === username && user.password === password) {
+// 	// 	// 	// console.log("login successfully");
+// 	// 	// 	// let path1 = path.join("public", "admin.html")
+// 	// 	// 	// console.log(path1);
+// 	// 	// 	// res.redirect(path.join("", "admin.html"));
+// 	// 	// 	// req.session["user"] = true;
+// 	// 	// 	// req.session.user = true
+// 	// 	// 	req.session.loggedIn = true
+// 	// 	// 	req.session.username = userResult.rows[0].username
+// 	// 	// 	req.session.userId = userResult.rows[0].id;
+// 	// 	// 	req.session.save()
+// 	// 	// 	res.status(200)
+// 	// 	// 	// res.status(200).redirect("/admin.html");
+// 	// 	// 	// res.status(200).send("/");
+// 	// 	// 	// res.status(200).json({ message: "Login Successful" })
+// 	// 	// 	console.log("req.session", req.session);
+// 	// 	// 	return
+// 	// 	// 	// 	}
+// 	// 	// 	// }
+// 	// 	// }
+// 	// 	// // console.log(req.session["user"]);
+// 	// 	// // console.log("login fail");
+
+// 	// 	// res.status(400).send('/login.html')
+
+// 	// 	// // res.redirect('/?msg=Login Failed')
+// 	// 	// // res.sendFile(path.resolve('./public/404.html'))
+// 	// })
+// })
 
 userRoutes.get('/likedmemo', async (req: express.Request, res: express.Response) => {
 	// app.get('/likedmemo', isLoggedIn, async (req: Request, res: Response, next) => {
