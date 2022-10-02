@@ -2,8 +2,7 @@ import express from 'express'
 // import expressSession from 'express-session';
 import path, { resolve } from 'path'
 import jsonfile from 'jsonfile'
-export const userRoutes = express.Router()
-import { form, client } from '../main'
+import { client, knex } from '../main'
 import { checkPassword, hashPassword } from '../hash';
 import fetch from 'cross-fetch';
 import crypto from 'crypto'
@@ -11,10 +10,11 @@ import { logger } from '../logger'
 import UserController from '../controllers/UserController'
 import UserService from '../services/UserService'
 import { Server as SocketIO } from 'socket.io'
+export const userRoutes = express.Router()
 
 
 export function initializeUserRoutes(io: SocketIO) {
-	const userService = new UserService();
+	const userService = new UserService(knex);
 	const userController = new UserController(userService, io);
 
 	// userRoutes.get('/', userController.getUsers)

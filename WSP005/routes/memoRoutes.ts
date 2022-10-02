@@ -2,11 +2,13 @@ import express from 'express'
 // import expressSession from 'express-session';
 import path from 'path'
 import jsonfile from 'jsonfile'
-import { form } from '../main'
+import { form } from '../utils/upload'
+//@ts-ignore
 export const memoRoutes = express.Router()
 import { isLoggedIn } from '../guard'
 import { logger } from '../logger'
 import { client, io } from '../main'
+
 
 memoRoutes.get('/', async (req: express.Request, res: express.Response) => {
 	// console.log(__dirname)
@@ -151,7 +153,7 @@ memoRoutes.put(
 		if (req.session.user) {
 			userId = req.session.user.userId
 		} else {
-			return res.status(400).json({ Message: "Please login first" })
+			res.status(400).json({ Message: "Please login first" })
 		}
 		// console.log(index);
 		// console.log(count);

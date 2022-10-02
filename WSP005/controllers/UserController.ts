@@ -1,8 +1,9 @@
-import UserService from "../services/UserService";
+import express from 'express'
 import SocketIO from 'socket.io';
 import { Request, Response } from "express"
+import UserService from "../services/UserService";
 import { checkPassword, hashPassword } from "../hash";
-import { form } from '../main';
+import { form } from '../utils/upload';
 import User from '../models/UserModels';
 import path from "path";
 import { logger } from "../logger";
@@ -88,7 +89,8 @@ export default class UserController {
         if (req.session.user) {
             userId = req.session.user.userId as number
         } else {
-            return res.status(400).json({ Message: "Please login first" })
+            res.status(400).json({ Message: "Please login first" })
+            return
         }
         // console.log(userId)
         // console.log(username);
@@ -111,12 +113,15 @@ export default class UserController {
             try {
                 const username = fields.username;
                 const password = fields.password;
+                // const username = req.body.username
+                // const password = req.body.password
 
                 // let password: string = fields.password
                 // console.log("username: ", username);
                 // console.log("password: ", password);
 
                 if (!username || !password) {
+                    console.log("not all");
                     res.status(401).json({ message: "Incorrect email or password" });
                     return;
                 }
@@ -125,6 +130,7 @@ export default class UserController {
                 // let user = (await client.query(/*sql*/ `Select * from users where username = ($1)`, [username])).rows[0];
                 // console.log(user);
                 if (!user || Object.keys(user).length === 0) {
+                    console.log("user not true");
                     res.status(401).json({ message: "Incorrect email or password" });
                     return;
                 }
@@ -134,6 +140,7 @@ export default class UserController {
 
                 req.session.user = {};
                 if (!match) {
+                    console.log("password not true");
                     res.status(401).json({ message: "Incorrect username or password" });
                     return;
                 }
@@ -146,7 +153,7 @@ export default class UserController {
 
                 // req.session.user.password = user.password;
                 req.session.save();
-                res.json({ message: "Login Successful", data: { user: req.session["user"] } });
+                res.status(200).json({ message: "Login Successful", data: { user: req.session["user"] } });
                 console.log("req.session", req.session);
             } catch (err) {
                 console.log(err);

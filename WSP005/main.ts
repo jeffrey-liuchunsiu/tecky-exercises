@@ -3,10 +3,10 @@ import { Request, Response } from 'express'
 import path from 'path'
 import expressSession from 'express-session'
 import jsonfile from 'jsonfile'
-import formidable from 'formidable'
+// import formidable from 'formidable'
 import fs from 'fs'
+import { initializeUserRoutes, userRoutes } from './routes/userRoutes'
 import { memoRoutes } from './routes/memoRoutes'
-import { userRoutes, initializeUserRoutes } from './routes/userRoutes'
 import { isLoggedIn } from './guard'
 import { logger } from './logger'
 import { Client } from 'pg';
@@ -14,6 +14,12 @@ import dotenv from 'dotenv';
 import http from 'http';
 import { Server as SocketIO } from 'socket.io';
 import grant from 'grant';
+
+import Knex from "knex";
+const knexConfigs = require("./knexfile");
+const configMode = process.env.NODE_ENV || "development";
+const knexConfig = knexConfigs[configMode];
+export const knex = Knex(knexConfig);
 
 dotenv.config();
 export const client = new Client({
@@ -69,30 +75,30 @@ declare module 'express-session' {
 const uploadDir = 'uploads'
 fs.mkdirSync(uploadDir, { recursive: true })
 
-export const form = formidable({
-	uploadDir,
-	keepExtensions: true,
-	maxFiles: 1,
-	maxFileSize: 200 * 1024 ** 2, // the default limit is 200KB
+// export const form = formidable({
+// 	uploadDir,
+// 	keepExtensions: true,
+// 	maxFiles: 1,
+// 	maxFileSize: 200 * 1024 ** 2, // the default limit is 200KB
 
-	// filter: part => { console.log(part); return part.mimetype?.startsWith('image/') || false; },
-	filter: (part) => {
-		if (part && part.mimetype) {
-			// console.log(part)
-			const type = part.mimetype
-			if (type.startsWith('image/')) {
-				return true
-			}
-		}
-		return false
-	},
-	// filter: part => part.mimetype?.startsWith('image/') || false,
-	filename: (originalName, originalExt, part, form) => {
-		let ext = part.mimetype?.split('/').pop()
-		let timestamp = Date.now()
-		return `${originalName}-${timestamp}.${ext}`
-	}
-})
+// 	// filter: part => { console.log(part); return part.mimetype?.startsWith('image/') || false; },
+// 	filter: (part) => {
+// 		if (part && part.mimetype) {
+// 			// console.log(part)
+// 			const type = part.mimetype
+// 			if (type.startsWith('image/')) {
+// 				return true
+// 			}
+// 		}
+// 		return false
+// 	},
+// 	// filter: part => part.mimetype?.startsWith('image/') || false,
+// 	filename: (originalName, originalExt, part, form) => {
+// 		let ext = part.mimetype?.split('/').pop()
+// 		let timestamp = Date.now()
+// 		return `${originalName}-${timestamp}.${ext}`
+// 	}
+// })
 
 initializeUserRoutes(io)
 
@@ -178,9 +184,9 @@ app.use(function (req: Request, res: Response, next) {
 //     // res.redirect("/")
 // })
 
-app.use('/memos', memoRoutes)
 
 app.use('/user', userRoutes)
+app.use('/memos', memoRoutes)
 
 // const isLoggedIn = (
 //     req: express.Request,

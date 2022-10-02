@@ -1,14 +1,18 @@
 // import { Client } from 'pg';
-import Knex from 'knex';
-const knexConfig = require('../knexfile.ts');
-const knex = Knex(knexConfig[process.env.NODE_ENV || "development"]);
+// import Knex from 'knex';
+// const knexConfig = require('../knexfile.ts');
+// export const knex = Knex(knexConfig[process.env.NODE_ENV || "development"]);
+import type { Knex } from "knex";
+// import { knex } from '../knexfile';
 import { hashPassword } from '../hash';
 // import Memo from '../models/MemoModel';
 import User from '../models/UserModels';
+// console.log(knex);
+
 export default class UserService {
-    private knex
-    constructor() {
-        this.knex = knex;
+    // private knex: KnexType
+    constructor(private knex: Knex) {
+        // this.knex = knex;
     }
 
     async getUsers(): Promise<User[]> {
@@ -127,7 +131,7 @@ export default class UserService {
     // }
 }
 
-let userService = new UserService()
+// let userService = new UserService(knex)
 
 // async function main() {
 

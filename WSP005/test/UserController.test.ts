@@ -1,13 +1,17 @@
 import { Request, Response } from 'express';
-import { Client } from 'pg';
-import UserController from '../controllers/UserController';
+// import { Client } from 'pg';
 import UserService from '../services/UserService';
+import UserController from '../controllers/UserController';
+// import { knex } from '../knexfile';
+import { Knex } from "knex";
 import SocketIO from 'socket.io';
-import User from '../models/UserModel';
+import User from '../models/UserModels';
 import { checkPassword } from '../hash';
 
 jest.mock('../services/UserService');
 jest.mock('../hash');
+// jest.mock('../controllers/UserController')
+
 describe("UerController", () => {
     let controller: UserController;
     let service: UserService;
@@ -21,12 +25,12 @@ describe("UerController", () => {
             id: 1,
             username: "Tony",
             password: "string",
-            image: "",
+            // image: "",
             created_at: new Date,
             updated_at: new Date
         };
 
-        service = new UserService({} as Client);
+        service = new UserService({} as Knex);
         service.getUsers = jest.fn(async () => [tony]);
         service.getUser = jest.fn(async () => tony);
         io = createSocketIO()
@@ -40,22 +44,31 @@ describe("UerController", () => {
         expect(service.getUsers).toBeCalledTimes(1)
         expect(res.json).toBeCalledWith([tony]);
     });
-    it("login invalid password", async () => {
+    it.only("login invalid password", async () => {
         await controller.login(req, res);
         expect(service.getUser).toBeCalledTimes(1)
-        expect(res.status).toBeCalledWith(400)
-        expect(res.status(400).json).toBeCalledWith({
-            message: 'Invalid username or password'
+        expect(res.status).toBeCalledWith(401)
+        expect(res.status(401).json).toBeCalledWith({
+            message: 'Incorrect username or password'
         });
     });
-    it("login valid password", async () => {
+    it.only("login valid password", async () => {
         (checkPassword as jest.Mock).mockReturnValue(true);
         await controller.login(req, res);
         expect(service.getUser).toBeCalledTimes(1)
         expect(res.status).toBeCalledWith(200)
+
+        let user = {
+            user: {
+                loggedIn: true,
+                username: tony.username,
+                userId: tony.id
+            }
+        }
         expect(res.status(200).json).toBeCalledWith({
-            message: "Success login",
-            user: { username: tony.username, image: tony.image }
+            message: "Login Successful",
+            // user: { username: tony.username }
+            data: { user: user.user }
         });
     });
 
