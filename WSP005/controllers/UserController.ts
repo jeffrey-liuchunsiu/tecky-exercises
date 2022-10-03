@@ -3,7 +3,7 @@ import SocketIO from 'socket.io';
 import { Request, Response } from "express"
 import UserService from "../services/UserService";
 import { checkPassword, hashPassword } from "../hash";
-import { form } from '../utils/upload';
+import { form, formParsePromise } from '../utils/upload';
 import User from '../models/UserModels';
 import path from "path";
 import { logger } from "../logger";
@@ -109,58 +109,63 @@ export default class UserController {
 
 
     login = async (req: Request, res: Response) => {
-        form.parse(req, async (err: any, fields: any, files: any) => {
-            try {
-                const username = fields.username;
-                const password = fields.password;
-                // const username = req.body.username
-                // const password = req.body.password
 
-                // let password: string = fields.password
-                // console.log("username: ", username);
-                // console.log("password: ", password);
 
-                if (!username || !password) {
-                    console.log("not all");
-                    res.status(401).json({ message: "Incorrect email or password" });
-                    return;
-                }
+        try {
+            let parsedResult = await formParsePromise(req)
+            console.log({ parsedResult })
+            let fields = parsedResult.fields
+            const username = fields.username;
+            const password = fields.password;
+            console.log('parse done', { username, password })
+            // const username = req.body.username
+            // const password = req.body.password
 
-                let user = await this.service.getUser(username)
-                // let user = (await client.query(/*sql*/ `Select * from users where username = ($1)`, [username])).rows[0];
-                // console.log(user);
-                if (!user || Object.keys(user).length === 0) {
-                    console.log("user not true");
-                    res.status(401).json({ message: "Incorrect email or password" });
-                    return;
-                }
+            // let password: string = fields.password
+            // console.log("username: ", username);
+            // console.log("password: ", password);
 
-                const match = await checkPassword(password, user.password);
-                // console.log(match);
-
-                req.session.user = {};
-                if (!match) {
-                    console.log("password not true");
-                    res.status(401).json({ message: "Incorrect username or password" });
-                    return;
-                }
-
-                req.session.user.loggedIn = true;
-                req.session.user.username = user.username;
-                // req.session.user.useremail = user.useremail;
-                req.session.user.userId = user.id;
-                // req.session.user.userimage = user.image;
-
-                // req.session.user.password = user.password;
-                req.session.save();
-                res.status(200).json({ message: "Login Successful", data: { user: req.session["user"] } });
-                console.log("req.session", req.session);
-            } catch (err) {
-                console.log(err);
-
-                res.status(500).json({ message: "Internal Server error" });
+            if (!username || !password) {
+                console.log("not all");
+                res.status(401).json({ message: "Incorrect email or password" });
+                return;
             }
-        });
+
+            let user = await this.service.getUser(username)
+            // let user = (await client.query(/*sql*/ `Select * from users where username = ($1)`, [username])).rows[0];
+            // console.log(user);
+            if (!user || Object.keys(user).length === 0) {
+                console.log("user not true");
+                res.status(401).json({ message: "Incorrect email or password" });
+                return;
+            }
+
+            const match = await checkPassword(password, user.password);
+            // console.log(match);
+
+            req.session.user = {};
+            if (!match) {
+                console.log("password not true");
+                res.status(401).json({ message: "Incorrect username or password" });
+                return;
+            }
+
+            req.session.user.loggedIn = true;
+            req.session.user.username = user.username;
+            // req.session.user.useremail = user.useremail;
+            req.session.user.userId = user.id;
+            // req.session.user.userimage = user.image;
+
+            // req.session.user.password = user.password;
+            req.session.save();
+            res.status(200).json({ message: "Login Successful", data: { user: req.session["user"] } });
+            console.log("req.session", req.session);
+        } catch (err) {
+            console.log(err);
+
+            res.status(500).json({ message: "Internal Server error" });
+        }
+
     }
 
     // login=async (req: Request, res: Response) => {

@@ -7,9 +7,15 @@ import { Knex } from "knex";
 import SocketIO from 'socket.io';
 import User from '../models/UserModels';
 import { checkPassword } from '../hash';
+import formidable from 'formidable'
+import IncomingForm from 'formidable/Formidable';
+import { request } from 'http';
+import { formParsePromise } from '../utils/upload';
+
 
 jest.mock('../services/UserService');
 jest.mock('../hash');
+jest.mock('../utils/upload')
 // jest.mock('../controllers/UserController')
 
 describe("UerController", () => {
@@ -19,7 +25,8 @@ describe("UerController", () => {
     let req: Request;
     let res: Response;
     let tony: User;
-
+    let form: IncomingForm;
+    // let formParsePromise: () => Promise<any>
     beforeEach(function () {
         tony = {
             id: 1,
@@ -33,9 +40,12 @@ describe("UerController", () => {
         service = new UserService({} as Knex);
         service.getUsers = jest.fn(async () => [tony]);
         service.getUser = jest.fn(async () => tony);
+        form = formidable({})
+        // formidableCB = jest.fn().mockResolvedValue({ err: null, fields: {}, files: [] })
         io = createSocketIO()
         req = createRequest()
         res = createResponse()
+        // formParsePromise = jest.fn().mockResolvedValue({ fields: { ...req.body } })
         controller = new UserController(service, io);
 
     })
@@ -46,13 +56,18 @@ describe("UerController", () => {
     });
     it.only("login invalid password", async () => {
         await controller.login(req, res);
+
+        // let result = await formParsePromise()
+        // console.log('result = ', result)
+        (formParsePromise as jest.Mock).mockResolvedValue({ fields: { ...req.body } })
+
         expect(service.getUser).toBeCalledTimes(1)
-        expect(res.status).toBeCalledWith(401)
+        expect(res.status).toBeCalledWith(500)
         expect(res.status(401).json).toBeCalledWith({
             message: 'Incorrect username or password'
         });
     });
-    it.only("login valid password", async () => {
+    it("login valid password", async () => {
         (checkPassword as jest.Mock).mockReturnValue(true);
         await controller.login(req, res);
         expect(service.getUser).toBeCalledTimes(1)

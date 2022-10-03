@@ -1,5 +1,6 @@
 
-import formidable from 'formidable'
+import formidable, { Fields, Files } from 'formidable'
+import { Request } from "express"
 export const uploadDir = 'uploads'
 
 export const form = formidable({
@@ -26,3 +27,17 @@ export const form = formidable({
         return `${originalName}-${timestamp}.${ext}`
     }
 })
+
+export function formParsePromise(req: Request) {
+    return new Promise<any>(function (resolve, reject) {
+        form.parse(req, async (err: any, fields: Fields, files: Files) => {
+            if (err) {
+                console.log('formParsePromise error')
+                reject(err)
+            }
+            console.log('formParsePromise normal')
+
+            resolve({ fields, files })
+        })
+    })
+}
