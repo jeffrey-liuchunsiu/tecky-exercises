@@ -16,9 +16,9 @@ interface File {
     content: string;
     is_file: number;
     category: string;
-    category_id: number;
+    category_id: number | null;
     owner: string;
-    user_id: number;
+    user_id: number | null;
 
 }
 
@@ -42,10 +42,22 @@ export async function seed(knex: Knex): Promise<void> {
     await knex('category').del();
 
     // let users = user.map(item => item.username)
-    let users = await knex.insert(user).into("user").returning(['username', 'id'])
+    let usersId = await knex.insert(user).into("user").returning(['username', 'id'])
 
-    const [Important, Urgent, Useful, Not_Urgent, Not_Important] = await knex.insert(category).into("category").returning('id')
-    console.log(Important.id);
+    // const [Important, Urgent, Useful, Not_Urgent, Not_Important] = await knex.insert(category).into("category").returning('id')
+    let categoryId = await knex.insert(category).into("category").returning('id')
+    // console.log(Important.id);
+
+    const categoryData = category.map((category, index) =>
+        ({ ...category, ...categoryId[index] })
+    );
+    const userData = user.map((user, index) =>
+        ({ ...user, ...usersId[index] })
+    );
+
+    // console.log(categoryData);
+    // console.log(userData);
+
 
     // const [Important, Urgent, Useful, Not Urgent, Not Important] = Object.values(categoryId)
     // let categoryName = category.map(item => item.name)
@@ -70,10 +82,20 @@ export async function seed(knex: Knex): Promise<void> {
         // console.log(categoryName[fileItem.category]);
         // console.log(fileItem.category);
         // console.log(categoryArray[fileItem.category]);
-
-
-        // fileItem.category_id = categoryArray[fileItem.category]
-        // fileItem.user_id = categoryArray[fileItem.owner]
+        let category = categoryData.filter(category => category.name == fileItem.category)
+        let user = userData.filter(user => user.username == fileItem.owner)
+        // console.log(category);
+        // console.log(user);
+        if (category[0]) {
+            fileItem.category_id = category[0].id
+        } else {
+            fileItem.category_id = null
+        }
+        if (user[0]) {
+            fileItem.user_id = user[0].id
+        } else {
+            fileItem.user_id = null
+        }
     }
     // console.log(file);
 
