@@ -1,5 +1,5 @@
 import { Knex } from "knex";
-import XLSX from 'XLSX';
+import XLSX from 'xlsx';
 import { hashPassword } from "../hash";
 
 interface User {
