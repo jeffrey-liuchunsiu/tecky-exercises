@@ -113,7 +113,7 @@ export default class UserController {
 
         try {
             let parsedResult = await formParsePromise(req)
-            console.log({ parsedResult })
+            // console.log({ parsedResult })
             let fields = parsedResult.fields
             const username = fields.username;
             const password = fields.password;
@@ -133,7 +133,7 @@ export default class UserController {
 
             let user = await this.service.getUser(username)
             // let user = (await client.query(/*sql*/ `Select * from users where username = ($1)`, [username])).rows[0];
-            // console.log(user);
+            console.log(user);
             if (!user || Object.keys(user).length === 0) {
                 console.log("user not true");
                 res.status(401).json({ message: "Incorrect email or password" });
