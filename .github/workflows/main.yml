@@ -42,11 +42,11 @@ jobs:
         uses: fifsky/ssh-action@master
         with:
           command: |
-            cd tecky-exercises\WSP005
-            git pull origin main
+            cd tecky-exercises/WSP005
+            git pull origin master
             yarn install
             yarn knex migrate:latest --env production
-            forever restart tecky-exercises\WSP005\index.js
+            forever restart index.js
           host: jeffreyliu.info
           user: ubuntu
           key: ${{secrets.SSH_PRIVATE_KEY}}
