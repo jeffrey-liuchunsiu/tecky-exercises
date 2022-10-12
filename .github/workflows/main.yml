@@ -2,7 +2,7 @@ name: memo_wall.dev
 on:
   push:
     branches:
-      - 'main'
+      - 'master'
       - 'production'
   workflow_dispatch:
 
