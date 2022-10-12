@@ -20,7 +20,7 @@ jobs:
       postgres:
         image: postgres
         env: 
-          POSTGRES_USER: ${{env.POSTGRES_USER}}
+          POSTGRES_USERNAME: ${{env.POSTGRES_USER}}
           POSTGRES_DB: ${{env.POSTGRES_DB}}
           POSTGRES_PASSWORD: ${{env.POSTGRES_PASSWORD}}
         ports:
