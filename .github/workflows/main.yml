@@ -33,23 +33,23 @@ jobs:
           cd test
           yarn jest ./UserController.test.ts
         working-directory: ./WSP005
-  # deploy:
-  #     if: github.ref_name == 'production'
-  #     runs-on: ubuntu-latest
-  #     needs: testing
-  #     steps:
-  #     - name: ssh to pull latest version
-  #       uses: fifsky/ssh-action@master
-  #       with:
-  #         command: |
-  #           cd tecky-exercises\WSP005
-  #           git pull origin main
-  #           yarn install
-  #           yarn knex migrate:latest --env production
-  #           forever restart index.js
-  #         host: c22sw.tecky.dev
-  #         user: ubuntu
-  #         key: ${{secrets.SSH_PRIVATE_KEY}}
+  deploy:
+      if: github.ref_name == 'production'
+      runs-on: ubuntu-latest
+      needs: testing
+      steps:
+      - name: ssh to pull latest version
+        uses: fifsky/ssh-action@master
+        with:
+          command: |
+            cd tecky-exercises\WSP005
+            git pull origin main
+            yarn install
+            yarn knex migrate:latest --env production
+            forever restart index.js
+          host: jeffreyliu.info
+          user: ubuntu
+          key: ${{secrets.SSH_PRIVATE_KEY}}
 
 
 
