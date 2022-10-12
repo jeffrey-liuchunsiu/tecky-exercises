@@ -46,7 +46,7 @@ jobs:
             git pull origin main
             yarn install
             yarn knex migrate:latest --env production
-            forever restart index.js
+            forever restart tecky-exercises\WSP005\index.js
           host: jeffreyliu.info
           user: ubuntu
           key: ${{secrets.SSH_PRIVATE_KEY}}
