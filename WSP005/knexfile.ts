@@ -30,10 +30,10 @@ const config: { [key: string]: Knex.Config } = {
   test: {
     client: 'postgresql',
     connection: {
-      host: process.env.POSTGRES_HOST,
-      database: process.env.POSTGRES_DB,
-      user: process.env.POSTGRES_USER,
-      password: process.env.POSTGRES_PASSWORD
+      host: process.env.TEST_POSTGRES_HOST,
+      database: process.env.TEST_POSTGRES_DB,
+      user: process.env.TEST_POSTGRES_USER,
+      password: process.env.TEST_POSTGRES_PASSWORD
     },
     pool: {
       min: 2,
