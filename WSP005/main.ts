@@ -360,7 +360,7 @@ app.use(isLoggedIn, express.static('protected'))
 app.use((req, res) => {
 	res.sendFile(path.resolve('./public/404.html'))
 })
-const PORT = 8080
+const PORT = 8000
 
 server.listen(PORT, () => {
 	logger.info(`Listening at http://localhost:${PORT}/`)
