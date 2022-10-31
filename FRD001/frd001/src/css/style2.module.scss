@@ -1,0 +1,35 @@
+$color: red;
+$headText : black;
+$text: white;
+
+.header {
+    color: $headText;
+}
+
+.mainPage {
+    background-color: $color;
+    color: $text;
+}
+
+@mixin avatar($size, $circle: false) {
+    width: $size * 2;
+    height: $size * 2;
+
+    @if $circle {
+        border-radius: $size;
+    }
+
+
+}
+
+.userIcon {
+    @include avatar(10vh, $circle: true)
+}
+
+.square-av {
+    @include avatar(10vh, $circle: false);
+}
+
+.circle-av {
+    @include avatar(10vh, $circle: true);
+}

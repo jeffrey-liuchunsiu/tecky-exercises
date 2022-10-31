@@ -1,0 +1,12 @@
+$color: red;
+$headText : black;
+$text: white;
+
+.header {
+    color: $headText;
+}
+
+.mainPage {
+    background-color: $color;
+    color: $text;
+}
