@@ -2,6 +2,17 @@
   text-align: center;
 }
 
+.header {
+  background-color: black;
+  color: white;
+}
+
+.img {
+  height: 150px;
+  width: 150px;
+  border-radius: 150px
+}
+
 /* .App-logo {
   height: 40vmin;
   pointer-events: none;
