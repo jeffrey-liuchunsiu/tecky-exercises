@@ -35,7 +35,7 @@ export default function TodoList() {
                 {items.map((item: string, index: number) => {
                     return (
                         <div>
-                            {<TodoItem value={item} />}
+                            {<TodoItem key={index} value={item} />}
                         </div>
                     )
                 })}
