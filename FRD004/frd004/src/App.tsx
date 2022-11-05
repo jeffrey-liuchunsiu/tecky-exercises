@@ -1,17 +1,20 @@
 import React from 'react';
 import logo from './logo.svg';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import Header from './components/Header';
 import Login from './components/Login';
 import UserProfile from './components/UserProfile';
+import Board from './components/Board';
 
 function App() {
 
   return (
     <div className="App">
-      {/* <Header /> */}
+      {/* <Header />
       <Login />
-      {/* <UserProfile /> */}
+      <UserProfile /> */}
+      <Board />
     </div>
   )
 

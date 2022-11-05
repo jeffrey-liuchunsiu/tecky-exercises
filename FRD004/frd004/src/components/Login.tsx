@@ -1,10 +1,13 @@
 import { useForm } from "react-hook-form"
-
+import { login, UserType } from "../redux/user/userSlice"
+import { useDispatch } from 'react-redux';
+import image from "../assets/user_icon.png"
 interface LoginFormType {
     username: string,
     password: string,
 }
 export default function Login() {
+    const dispatch = useDispatch()
     const { register, handleSubmit } = useForm<LoginFormType>({
         defaultValues: {
             username: "",
@@ -16,7 +19,15 @@ export default function Login() {
         console.log(data.username)
         console.log(data.password)
         if (data.username === "james" && data.password === "1234") {
+            dispatch(login({
+                firstName: "Jares",
+                lastName: "1234",
+                age: 18,
+                gender: "M",
+                images: image,
+                isLoggedIn: true
 
+            } as UserType))
         }
     }
 
