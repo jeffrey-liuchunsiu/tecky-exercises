@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 import image from "../../assets/user_icon.png"
 
 export interface UserType {
+    id: number,
     firstName: string,
     lastName: string,
     age: number,

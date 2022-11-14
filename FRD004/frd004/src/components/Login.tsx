@@ -2,14 +2,18 @@ import { useForm } from "react-hook-form"
 import { login, UserType } from "../redux/user/userSlice"
 import { useDispatch } from 'react-redux';
 import image from "../assets/user_icon.png"
+import { useNavigate } from "react-router";
 interface LoginFormType {
+    id: number,
     username: string,
     password: string,
 }
 export default function Login() {
     const dispatch = useDispatch()
+    const navigate = useNavigate();
     const { register, handleSubmit } = useForm<LoginFormType>({
         defaultValues: {
+            id: 0,
             username: "",
             password: ""
         }
@@ -19,7 +23,8 @@ export default function Login() {
         console.log(data.username)
         console.log(data.password)
         if (data.username === "james" && data.password === "1234") {
-            dispatch(login({
+            const resData = {
+                id: 11,
                 firstName: "Jares",
                 lastName: "1234",
                 age: 18,
@@ -27,7 +32,11 @@ export default function Login() {
                 images: image,
                 isLoggedIn: true
 
-            } as UserType))
+            } as UserType
+            dispatch(login(resData))
+            navigate(`/about/me/${resData.id}`)
+        } else {
+            navigate(`/games`)
         }
     }
 
